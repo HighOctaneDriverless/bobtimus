@@ -22,7 +22,7 @@ class HornPublisher(RosToCanPublisher):
     def publish_values(self):
         if self.horn_status:
             print "0x242" + str(int(self.horn_status))
-            self.send_message(0x242, [int(self.horn_status), 0, 0, 0, 0, 0, 0, 0] , False)
+            self.send_message(0x242, [int(self.horn_status), 0, 0, 0, 0, 0, 0, 0], False)
 
     def set_horn_status(self, data):
         self.horn_status = data.data
