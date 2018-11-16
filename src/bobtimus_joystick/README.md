@@ -32,7 +32,7 @@ Adapt permissions for the controller and setup joy node parameter
 
 ```
 sudo chmod a+rw /dev/input/[your controller]
-rosparam set joy_node/dev "/dev/input/[your controller"
+rosparam set joy_node/dev "/dev/input/[your controller]"
 ```
 
 ##### Step 4)
