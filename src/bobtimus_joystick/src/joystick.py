@@ -5,8 +5,13 @@ from sensor_msgs.msg import Joy
 from std_msgs.msg import Float64, Bool
 import math
 
+"""
+Node to allow controlling the racecar with a common gaming controller.
+It takes the input from the joy node and performs actions based on the pressed buttons
+"""
 
-class Ackermann():
+
+class Joystick():
     def __init__(self):
         self.subscribe()
         self.speed = 0.0
@@ -17,23 +22,19 @@ class Ackermann():
         rospy.init_node('joystick_control', anonymous=True)
 
         # init publisher
-        self.pub_acc = rospy.Publisher("/bobtimus/speed/command", Float64, queue_size=1)
-        self.pub_steering = rospy.Publisher("bobtimus/steer/command", Float64, queue_size=1)
+        self.pub_speed = rospy.Publisher("/bobtimus/speed/", Float64, queue_size=1)
+        self.pub_steering = rospy.Publisher("bobtimus/steer/", Float64, queue_size=1)
         self.pub_horn = rospy.Publisher("bobtimus/can/horn", Bool, queue_size=1)
 
     def callback_controller(self, data):
+        """Gets called when new controller data is available"""
+
         # RT Button
-        self.set_speed(data.axes[5])
+        self.speed = data.axes[5]
         # Left Joystick X Axis
-        self.set_steering(data.axes[0])
-
+        self.steeringAngle = data.axes[0]
+        # Rest of the Buttons
         self.buttons = data.buttons
-
-    def set_speed(self, new_speed):
-        self.speed = new_speed
-
-    def set_steering(self, new_steering):
-        self.steeringAngle = new_steering
 
     def subscribe(self):
         # init subscriber
@@ -42,27 +43,33 @@ class Ackermann():
     def publish(self):
         if self.buttons is not None:
             """button was pressed"""
-            if self.buttons[1]:  # (b) Button pressed
-                self.speed = 0
-                self.pub_acc.publish(Float64(0))
-            if self.buttons[0]: # (a) Button pressed
+
+            if self.buttons[0]:
+                # (a) Button pressed
                 self.pub_horn.publish(True)
             else:
                 self.pub_horn.publish(False)
 
-        # convert 1 - (-1) range to 0 - 1 range
-        speedOut = 1 - ((self.speed + 1) / 2)  # outputting 10m/s max equals 36km/h
-        self.pub_acc.publish(Float64(speedOut))
-        steerOut = self.steeringAngle * math.radians(25)
-        self.pub_steering.publish(Float64(steerOut))
+            if self.buttons[1]:
+                # (b) Button pressed
+                self.speed = -1;
+                self.pub_speed.publish(Float64(0))
+
+        # Calculate speed, convert [1,-1] range to [0,1] range
+        speed_out = 1 - ((self.speed + 1) / 2)
+        self.pub_speed.publish(Float64(speed_out))
+
+        # Calculate steering, with a maximum of 25 degrees in each direction
+        steer_out = self.steeringAngle * math.radians(25)
+        self.pub_steering.publish(Float64(steer_out))
 
 
 def main():
-    ackerm = Ackermann()
+    joystick = Joystick()
     rospy.loginfo("Joystick started")
-    rate = rospy.Rate(100)  #
+    rate = rospy.Rate(100)
     while not rospy.is_shutdown():
-        ackerm.publish()
+        joystick.publish()
         rate.sleep()
 
 
