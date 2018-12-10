@@ -18,9 +18,9 @@
 
     <!-- Older versions of the scanner firmware report an incorrect time_increment.
          If you get a warning about time_increment, uncomment this. -->
-    <!-- <param name="time_increment" type="double" value="0.000061722" /> -->
+    <param name="time_increment" type="double" value="0.000013889" />
 
-    <param name="hostname" type="string" value="192.168.0.1" />
+    <param name="hostname" type="string" value="192.168.9.10" />
     <param name="port" type="string" value="2111" />
   </node>
 </launch>
