@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+
+<!--<include file="$(find bobtimus_lidar)/launch/sick_mrs1000.launch" />-->
+
+  <include file="$(find obstacle_detector)/launch/test.launch" />
+
+  <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find obstacle_detector)/resources/obstacle_detector.rviz"/>
+
+</launch>
+
